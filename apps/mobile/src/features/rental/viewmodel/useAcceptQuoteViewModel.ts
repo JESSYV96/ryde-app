@@ -3,10 +3,13 @@ import { router } from 'expo-router';
 import type { RefObject } from 'react';
 import { useState } from 'react';
 
+import { createAndSendPaymentLink } from '@/features/payment/services/paymentLinkService';
+import { PaymentKind, PaymentStatus } from '@/features/rental/model/rental.types';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
 import { saveSignature } from '@/features/rental/services/photoStorageService';
+import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
 import type { SignaturePadRef } from '@/shared/ui/design-system/atoms/SignaturePad';
 
 interface UseAcceptQuoteViewModelDeps {
@@ -32,7 +35,32 @@ export const useAcceptQuoteViewModel = (
         throw new Error('Missing signature export');
       }
       const signatureUri = saveSignature({ base64Png, rentalId });
-      return repository.acceptQuote(rentalId, { signatureUri });
+      const accepted = await repository.acceptQuote(rentalId, { signatureUri });
+
+      try {
+        const { currency } = await companySettingsRepository.getSettings();
+        const { stripeSessionId, paymentUrl } = await createAndSendPaymentLink({
+          rentalId,
+          kind: PaymentKind.Quote,
+          amount: accepted.totalPrice,
+          currency,
+          customerEmail: accepted.customer.email,
+          customerName: `${accepted.customer.firstName} ${accepted.customer.lastName}`,
+          vehicleLabel: `${accepted.vehicleSnapshot.make} ${accepted.vehicleSnapshot.model}`,
+        });
+        await repository.addPayment(rentalId, {
+          kind: PaymentKind.Quote,
+          amount: accepted.totalPrice,
+          currency,
+          status: PaymentStatus.Pending,
+          stripeSessionId,
+          paymentUrl,
+        });
+      } catch (error) {
+        console.warn('Failed to send the quote payment link', error);
+      }
+
+      return accepted;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: rentalQueryKeys.detail(rentalId) });

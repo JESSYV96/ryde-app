@@ -5,13 +5,16 @@ import { router } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { createAndSendPaymentLink } from '@/features/payment/services/paymentLinkService';
 import { createReturnSchema, type ReturnInput } from '@/features/rental/model/rental.schema';
-import { PhotoPhase } from '@/features/rental/model/rental.types';
+import { PaymentKind, PaymentStatus, PhotoPhase } from '@/features/rental/model/rental.types';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
 import { generateReturnReportPdf } from '@/features/rental/services/pdf/quotePdfService';
 import { copyToPermanentStorage, deletePhotos } from '@/features/rental/services/photoStorageService';
+import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
+import { computeExtraKmCharge } from '@/shared/utils/pricing';
 import { useRentalReturnDraftStore } from '@/store/rentalReturnDraftStore';
 
 interface UseReturnStepViewModelDeps {
@@ -56,6 +59,35 @@ export const useReturnStepViewModel = (
         endConditionNotes: value.endConditionNotes,
         photos: draft.photos.map((photo) => ({ uri: photo.uri, phase: photo.phase, takenAt: photo.takenAt })),
       });
+
+      try {
+        const includedKm = (updated.vehicleSnapshot.includedKmPerDay / 2) * updated.billableHalfDays;
+        const actualKm = updated.mileageAtEnd! - updated.mileageAtStart;
+        const extraCharge = computeExtraKmCharge(actualKm, includedKm, updated.vehicleSnapshot.extraKmRate);
+        if (extraCharge > 0) {
+          const { currency } = await companySettingsRepository.getSettings();
+          const { stripeSessionId, paymentUrl } = await createAndSendPaymentLink({
+            rentalId,
+            kind: PaymentKind.ExtraMileage,
+            amount: extraCharge,
+            currency,
+            customerEmail: updated.customer.email,
+            customerName: `${updated.customer.firstName} ${updated.customer.lastName}`,
+            vehicleLabel: `${updated.vehicleSnapshot.make} ${updated.vehicleSnapshot.model}`,
+          });
+          await repository.addPayment(rentalId, {
+            kind: PaymentKind.ExtraMileage,
+            amount: extraCharge,
+            currency,
+            status: PaymentStatus.Pending,
+            stripeSessionId,
+            paymentUrl,
+          });
+        }
+      } catch (error) {
+        console.warn('Failed to send the extra-mileage payment link', error);
+      }
+
       const returnReportPdfUri = await generateReturnReportPdf(updated);
       return repository.update(rentalId, { returnReportPdfUri });
     },
