@@ -11,6 +11,7 @@ import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepos
 import { generateQuotePdf } from '@/features/rental/services/pdf/quotePdfService';
 import { deletePhotos } from '@/features/rental/services/photoStorageService';
 import { useRentalDraftStore } from '@/store/rentalDraftStore';
+import { computeQuotePrice, getBillableHalfDays } from '@/shared/utils/pricing';
 
 interface UseRecapStepViewModelDeps {
   rentalRepository?: RentalRepositoryInterface;
@@ -34,9 +35,13 @@ export const useRecapStepViewModel = ({
     enabled: Boolean(draft.vehicleId),
   });
 
+  const billableHalfDays =
+    vehicle && draft.startDate && draft.endDate ? getBillableHalfDays(draft.startDate, draft.endDate) : null;
+  const quotePrice = vehicle && billableHalfDays !== null ? computeQuotePrice(vehicle, billableHalfDays) : null;
+
   const createRentalMutation = useMutation({
     mutationFn: async () => {
-      if (!vehicle || !draft.startDate || !draft.endDate) {
+      if (!vehicle || !draft.startDate || !draft.endDate || billableHalfDays === null || !quotePrice) {
         return null;
       }
       const { mileageAtStart, fuelLevelAtStart } = draft.inspection;
@@ -60,6 +65,9 @@ export const useRecapStepViewModel = ({
           year: vehicle.year,
           licensePlate: vehicle.licensePlate,
           color: vehicle.color,
+          dailyRate: vehicle.dailyRate,
+          includedKmPerDay: vehicle.includedKmPerDay,
+          extraKmRate: vehicle.extraKmRate,
         },
         startDate: draft.startDate,
         endDate: draft.endDate,
@@ -67,6 +75,8 @@ export const useRecapStepViewModel = ({
         fuelLevelAtStart,
         conditionNotes: draft.inspection.conditionNotes,
         photos: draft.photos.map((photo) => ({ uri: photo.uri, phase: photo.phase, takenAt: photo.takenAt })),
+        totalPrice: quotePrice.totalPrice,
+        billableHalfDays,
       });
 
       const pdfUri = await generateQuotePdf(rental);
@@ -99,7 +109,7 @@ export const useRecapStepViewModel = ({
     router.dismissTo('/');
   };
 
-  return { draft, vehicle, isLoadingVehicle, vehicleError, form, onBack, onCancel };
+  return { draft, vehicle, isLoadingVehicle, vehicleError, quotePrice, form, onBack, onCancel };
 };
 
 export interface UseRecapStepViewModelResult extends ReturnType<typeof useRecapStepViewModel> {}

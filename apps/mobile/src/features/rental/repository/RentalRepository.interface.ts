@@ -1,4 +1,4 @@
-import type { Rental, RentalCreateInput, RentalReturnInput } from '@/features/rental/model/rental.types';
+import type { Payment, PaymentInput, Rental, RentalCreateInput, RentalReturnInput } from '@/features/rental/model/rental.types';
 
 export interface RentalRepositoryInterface {
   getAll(): Promise<Rental[]>;
@@ -7,6 +7,8 @@ export interface RentalRepositoryInterface {
   update(id: string, patch: Partial<Pick<Rental, 'quotePdfUri' | 'returnReportPdfUri'>>): Promise<Rental>;
   acceptQuote(id: string, input: { signatureUri: string }): Promise<Rental>;
   recordReturn(id: string, input: RentalReturnInput): Promise<Rental>;
+  addPayment(rentalId: string, input: PaymentInput): Promise<Payment>;
+  markPaymentPaid(paymentId: string, paidAt: string): Promise<Payment>;
   remove(id: string): Promise<void>;
 }
 

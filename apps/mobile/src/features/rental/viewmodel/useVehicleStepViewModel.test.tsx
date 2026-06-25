@@ -21,6 +21,9 @@ const vehicle: Vehicle = {
   year: 2022,
   licensePlate: 'ABC-123',
   color: 'Argent',
+  dailyRate: 55,
+  includedKmPerDay: 200,
+  extraKmRate: 0.3,
 };
 
 const createFakeRepository = (vehicles: Vehicle[]): FleetRepositoryInterface => ({

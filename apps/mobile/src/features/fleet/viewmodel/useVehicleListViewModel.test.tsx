@@ -16,6 +16,9 @@ const createVehicle = (overrides: Partial<Vehicle>): Vehicle => ({
   year: 2022,
   licensePlate: 'ABC-123',
   color: 'Argent',
+  dailyRate: 55,
+  includedKmPerDay: 200,
+  extraKmRate: 0.3,
   ...overrides,
 });
 
@@ -30,13 +33,25 @@ const createRental = (overrides: Partial<Rental>): Rental => ({
     licensePhotoBackUri: 'file:///back.jpg',
   },
   vehicleId: 'vehicle-1',
-  vehicleSnapshot: { make: 'Toyota', model: 'Corolla', year: 2022, licensePlate: 'ABC-123', color: 'Argent' },
+  vehicleSnapshot: {
+    make: 'Toyota',
+    model: 'Corolla',
+    year: 2022,
+    licensePlate: 'ABC-123',
+    color: 'Argent',
+    dailyRate: 55,
+    includedKmPerDay: 200,
+    extraKmRate: 0.3,
+  },
   startDate: '2026-07-01T00:00:00.000Z',
   endDate: '2026-07-05T00:00:00.000Z',
   mileageAtStart: 10000,
   fuelLevelAtStart: 100,
   conditionNotes: '',
   photos: [],
+  totalPrice: 220,
+  billableHalfDays: 8,
+  payments: [],
   quotePdfUri: null,
   createdAt: '2026-06-20T00:00:00.000Z',
   acceptedAt: null,
@@ -67,6 +82,12 @@ const createFakeRentalRepository = (rentals: Rental[]): RentalRepositoryInterfac
     throw new Error('not implemented');
   },
   recordReturn: async () => {
+    throw new Error('not implemented');
+  },
+  addPayment: async () => {
+    throw new Error('not implemented');
+  },
+  markPaymentPaid: async () => {
     throw new Error('not implemented');
   },
   remove: async () => {

@@ -13,6 +13,9 @@ const vehicle: Vehicle = {
   model: 'Corolla',
   year: 2022,
   licensePlate: 'ABC-123',
+  dailyRate: 55,
+  includedKmPerDay: 200,
+  extraKmRate: 0.3,
   color: 'Argent',
 };
 

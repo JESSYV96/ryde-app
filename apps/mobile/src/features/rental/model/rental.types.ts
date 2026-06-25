@@ -42,6 +42,9 @@ export type RentalVehicle = {
   year: number;
   licensePlate: string;
   color: string;
+  dailyRate: number;
+  includedKmPerDay: number;
+  extraKmRate: number;
 };
 
 /**
@@ -66,6 +69,48 @@ export type RentalReturnPhotoInput = {
   takenAt: string;
 };
 
+export const PaymentKind = {
+  Quote: 'quote',
+  ExtraMileage: 'extra-mileage',
+} as const;
+
+export type PaymentKind = (typeof PaymentKind)[keyof typeof PaymentKind];
+
+export const PaymentStatus = {
+  Pending: 'pending',
+  Paid: 'paid',
+} as const;
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
+/**
+ * A Stripe payment link sent to the customer for this rental — either the
+ * upfront quote price (`kind: 'quote'`, sent at quote acceptance) or an
+ * extra-mileage surcharge discovered at return (`kind: 'extra-mileage'`).
+ * A `Payment` doesn't make sense outside of a `Rental`, same as `Photo`.
+ */
+export type Payment = {
+  id: string;
+  rentalId: string;
+  kind: PaymentKind;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  stripeSessionId: string;
+  paymentUrl: string;
+  createdAt: string;
+  paidAt: string | null;
+};
+
+export type PaymentInput = {
+  kind: PaymentKind;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  stripeSessionId: string;
+  paymentUrl: string;
+};
+
 export type Rental = {
   id: string;
   customer: RentalCustomer;
@@ -77,6 +122,9 @@ export type Rental = {
   fuelLevelAtStart: number;
   conditionNotes: string;
   photos: Photo[];
+  totalPrice: number;
+  billableHalfDays: number;
+  payments: Payment[];
   quotePdfUri: string | null;
   createdAt: string;
   acceptedAt: string | null;
@@ -98,6 +146,8 @@ export type RentalCreateInput = {
   fuelLevelAtStart: number;
   conditionNotes: string;
   photos: RentalPhotoInput[];
+  totalPrice: number;
+  billableHalfDays: number;
 };
 
 /**

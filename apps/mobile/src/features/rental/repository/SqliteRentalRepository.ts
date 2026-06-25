@@ -1,4 +1,8 @@
 import type {
+  Payment,
+  PaymentInput,
+  PaymentKind,
+  PaymentStatus,
   Photo,
   PhotoPhase,
   Rental,
@@ -35,6 +39,8 @@ type RentalRow = {
   return_report_pdf_uri: string | null;
   customer_license_photo_front_uri: string;
   customer_license_photo_back_uri: string;
+  total_price: number;
+  billable_half_days: number;
 };
 
 type PhotoRow = {
@@ -45,7 +51,20 @@ type PhotoRow = {
   taken_at: string;
 };
 
-const mapRentalRow = (row: RentalRow, photos: Photo[]): Rental => {
+type PaymentRow = {
+  id: string;
+  rental_id: string;
+  kind: PaymentKind;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  stripe_session_id: string;
+  payment_url: string;
+  created_at: string;
+  paid_at: string | null;
+};
+
+const mapRentalRow = (row: RentalRow, photos: Photo[], payments: Payment[]): Rental => {
   return {
     id: row.id,
     customer: {
@@ -64,6 +83,9 @@ const mapRentalRow = (row: RentalRow, photos: Photo[]): Rental => {
     fuelLevelAtStart: row.fuel_level_at_start,
     conditionNotes: row.condition_notes,
     photos,
+    totalPrice: row.total_price,
+    billableHalfDays: row.billable_half_days,
+    payments,
     quotePdfUri: row.quote_pdf_uri,
     createdAt: row.created_at,
     acceptedAt: row.accepted_at,
@@ -80,6 +102,21 @@ const mapPhotoRow = (row: PhotoRow): Photo => {
   return { id: row.id, rentalId: row.rental_id, uri: row.uri, phase: row.phase, takenAt: row.taken_at };
 };
 
+const mapPaymentRow = (row: PaymentRow): Payment => {
+  return {
+    id: row.id,
+    rentalId: row.rental_id,
+    kind: row.kind,
+    amount: row.amount,
+    currency: row.currency,
+    status: row.status,
+    stripeSessionId: row.stripe_session_id,
+    paymentUrl: row.payment_url,
+    createdAt: row.created_at,
+    paidAt: row.paid_at,
+  };
+};
+
 export class SqliteRentalRepository implements RentalRepositoryInterface {
   async getAll(): Promise<Rental[]> {
     const db = await getDb();
@@ -87,7 +124,8 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
     const rentals: Rental[] = [];
     for (const row of rentalRows) {
       const photoRows = await db.getAllAsync<PhotoRow>('SELECT * FROM photos WHERE rental_id = ?', row.id);
-      rentals.push(mapRentalRow(row, photoRows.map(mapPhotoRow)));
+      const paymentRows = await db.getAllAsync<PaymentRow>('SELECT * FROM payments WHERE rental_id = ?', row.id);
+      rentals.push(mapRentalRow(row, photoRows.map(mapPhotoRow), paymentRows.map(mapPaymentRow)));
     }
     return rentals;
   }
@@ -99,7 +137,8 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
       return null;
     }
     const photoRows = await db.getAllAsync<PhotoRow>('SELECT * FROM photos WHERE rental_id = ?', id);
-    return mapRentalRow(row, photoRows.map(mapPhotoRow));
+    const paymentRows = await db.getAllAsync<PaymentRow>('SELECT * FROM payments WHERE rental_id = ?', id);
+    return mapRentalRow(row, photoRows.map(mapPhotoRow), paymentRows.map(mapPaymentRow));
   }
 
   async create(input: RentalCreateInput): Promise<Rental> {
@@ -118,8 +157,8 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
           customer_email, customer_phone_number, customer_license_photo_front_uri,
           customer_license_photo_back_uri, vehicle_id, vehicle_snapshot_json,
           start_date, end_date, mileage_at_start, fuel_level_at_start, condition_notes,
-          quote_pdf_uri, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          total_price, billable_half_days, quote_pdf_uri, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         id,
         input.customer.firstName,
         input.customer.lastName,
@@ -134,6 +173,8 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
         input.mileageAtStart,
         input.fuelLevelAtStart,
         input.conditionNotes,
+        input.totalPrice,
+        input.billableHalfDays,
         null,
         createdAt
       );
@@ -220,6 +261,42 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
       throw new Error(`Rental ${id} not found`);
     }
     return updated;
+  }
+
+  async addPayment(rentalId: string, input: PaymentInput): Promise<Payment> {
+    const db = await getDb();
+    const id = generateId();
+    const createdAt = nowIso();
+    await db.runAsync(
+      `INSERT INTO payments (
+        id, rental_id, kind, amount, currency, status, stripe_session_id, payment_url, created_at, paid_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id,
+      rentalId,
+      input.kind,
+      input.amount,
+      input.currency,
+      input.status,
+      input.stripeSessionId,
+      input.paymentUrl,
+      createdAt,
+      null
+    );
+    const row = await db.getFirstAsync<PaymentRow>('SELECT * FROM payments WHERE id = ?', id);
+    if (!row) {
+      throw new Error('Failed to read back the payment that was just created');
+    }
+    return mapPaymentRow(row);
+  }
+
+  async markPaymentPaid(paymentId: string, paidAt: string): Promise<Payment> {
+    const db = await getDb();
+    await db.runAsync('UPDATE payments SET status = ?, paid_at = ? WHERE id = ?', 'paid', paidAt, paymentId);
+    const row = await db.getFirstAsync<PaymentRow>('SELECT * FROM payments WHERE id = ?', paymentId);
+    if (!row) {
+      throw new Error(`Payment ${paymentId} not found`);
+    }
+    return mapPaymentRow(row);
   }
 
   async remove(id: string): Promise<void> {

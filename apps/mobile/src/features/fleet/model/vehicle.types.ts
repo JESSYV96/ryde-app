@@ -5,4 +5,7 @@ export type Vehicle = {
   year: number;
   licensePlate: string;
   color: string;
+  dailyRate: number;
+  includedKmPerDay: number;
+  extraKmRate: number;
 };

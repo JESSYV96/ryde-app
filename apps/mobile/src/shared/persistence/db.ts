@@ -38,6 +38,19 @@ const runMigrations = async (db: SQLiteDatabase): Promise<void> => {
       taken_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_photos_rental_id ON photos(rental_id);
+    CREATE TABLE IF NOT EXISTS payments (
+      id TEXT PRIMARY KEY NOT NULL,
+      rental_id TEXT NOT NULL REFERENCES rentals(id) ON DELETE CASCADE,
+      kind TEXT NOT NULL CHECK (kind IN ('quote', 'extra-mileage')),
+      amount REAL NOT NULL,
+      currency TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('pending', 'paid')),
+      stripe_session_id TEXT NOT NULL,
+      payment_url TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      paid_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_payments_rental_id ON payments(rental_id);
   `);
 
   const rentalsColumns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(rentals)');
@@ -56,6 +69,12 @@ const runMigrations = async (db: SQLiteDatabase): Promise<void> => {
   }
   if (!existingColumnNames.has('signature_uri')) {
     await db.execAsync('ALTER TABLE rentals ADD COLUMN signature_uri TEXT;');
+  }
+  if (!existingColumnNames.has('total_price')) {
+    await db.execAsync('ALTER TABLE rentals ADD COLUMN total_price REAL NOT NULL DEFAULT 0;');
+  }
+  if (!existingColumnNames.has('billable_half_days')) {
+    await db.execAsync('ALTER TABLE rentals ADD COLUMN billable_half_days INTEGER NOT NULL DEFAULT 0;');
   }
 };
 

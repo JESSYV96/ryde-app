@@ -26,6 +26,9 @@ const vehicle: Vehicle = {
   year: 2022,
   licensePlate: 'ABC-123',
   color: 'Argent',
+  dailyRate: 55,
+  includedKmPerDay: 200,
+  extraKmRate: 0.3,
 };
 
 const createRental = (overrides: Partial<Rental>): Rental => ({
@@ -39,13 +42,25 @@ const createRental = (overrides: Partial<Rental>): Rental => ({
     licensePhotoBackUri: 'file:///back.jpg',
   },
   vehicleId: vehicle.id,
-  vehicleSnapshot: { make: vehicle.make, model: vehicle.model, year: vehicle.year, licensePlate: vehicle.licensePlate, color: vehicle.color },
+  vehicleSnapshot: {
+    make: vehicle.make,
+    model: vehicle.model,
+    year: vehicle.year,
+    licensePlate: vehicle.licensePlate,
+    color: vehicle.color,
+    dailyRate: vehicle.dailyRate,
+    includedKmPerDay: vehicle.includedKmPerDay,
+    extraKmRate: vehicle.extraKmRate,
+  },
   startDate: '2026-07-01T00:00:00.000Z',
   endDate: '2026-07-05T00:00:00.000Z',
   mileageAtStart: 10000,
   fuelLevelAtStart: 100,
   conditionNotes: '',
   photos: [],
+  totalPrice: 220,
+  billableHalfDays: 8,
+  payments: [],
   quotePdfUri: null,
   createdAt: '2026-06-20T00:00:00.000Z',
   acceptedAt: null,
@@ -72,6 +87,12 @@ const createFakeRentalRepository = (rental: Rental): RentalRepositoryInterface =
     throw new Error('not implemented');
   },
   recordReturn: async () => {
+    throw new Error('not implemented');
+  },
+  addPayment: async () => {
+    throw new Error('not implemented');
+  },
+  markPaymentPaid: async () => {
     throw new Error('not implemented');
   },
   remove: async () => {
