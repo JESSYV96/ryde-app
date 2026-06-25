@@ -7,6 +7,7 @@ import { Colors } from '@/shared/ui/theme';
 const TabsLayout = () => {
   const { t: tHome } = useTranslation('home');
   const { t: tFleet } = useTranslation('fleet');
+  const { t: tSettings } = useTranslation('settings');
 
   return (
     <Tabs
@@ -35,6 +36,15 @@ const TabsLayout = () => {
               tintColor={color}
               size={size}
             />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: tSettings('tabName'),
+          tabBarIcon: ({ color, size }) => (
+            <SymbolView name={{ android: 'settings', ios: 'gearshape.fill' }} tintColor={color} size={size} />
           ),
         }}
       />

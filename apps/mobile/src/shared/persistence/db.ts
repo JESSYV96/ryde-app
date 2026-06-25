@@ -51,6 +51,11 @@ const runMigrations = async (db: SQLiteDatabase): Promise<void> => {
       paid_at TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_payments_rental_id ON payments(rental_id);
+    CREATE TABLE IF NOT EXISTS company_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      currency TEXT NOT NULL DEFAULT 'CAD'
+    );
+    INSERT OR IGNORE INTO company_settings (id, currency) VALUES (1, 'CAD');
   `);
 
   const rentalsColumns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(rentals)');
