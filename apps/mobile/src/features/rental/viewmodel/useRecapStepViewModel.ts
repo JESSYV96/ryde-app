@@ -10,8 +10,10 @@ import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.i
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
 import { generateQuotePdf } from '@/features/rental/services/pdf/quotePdfService';
 import { deletePhotos } from '@/features/rental/services/photoStorageService';
-import { useRentalDraftStore } from '@/store/rentalDraftStore';
+import { companySettingsQueryKeys } from '@/features/settings/repository/CompanySettingsRepository.interface';
+import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
 import { computeQuotePrice, getBillableHalfDays } from '@/shared/utils/pricing';
+import { useRentalDraftStore } from '@/store/rentalDraftStore';
 
 interface UseRecapStepViewModelDeps {
   rentalRepository?: RentalRepositoryInterface;
@@ -34,6 +36,12 @@ export const useRecapStepViewModel = ({
     queryFn: () => fleetRepo.getById(draft.vehicleId as string),
     enabled: Boolean(draft.vehicleId),
   });
+
+  const { data: companySettings } = useQuery({
+    queryKey: companySettingsQueryKeys.detail(),
+    queryFn: () => companySettingsRepository.getSettings(),
+  });
+  const currency = companySettings?.currency ?? 'CAD';
 
   const billableHalfDays =
     vehicle && draft.startDate && draft.endDate ? getBillableHalfDays(draft.startDate, draft.endDate) : null;
@@ -79,7 +87,7 @@ export const useRecapStepViewModel = ({
         billableHalfDays,
       });
 
-      const pdfUri = await generateQuotePdf(rental);
+      const pdfUri = await generateQuotePdf(rental, currency);
       return repository.update(rental.id, { quotePdfUri: pdfUri });
     },
     onSuccess: () => {
@@ -109,7 +117,7 @@ export const useRecapStepViewModel = ({
     router.dismissTo('/');
   };
 
-  return { draft, vehicle, isLoadingVehicle, vehicleError, quotePrice, form, onBack, onCancel };
+  return { draft, vehicle, isLoadingVehicle, vehicleError, quotePrice, currency, form, onBack, onCancel };
 };
 
 export interface UseRecapStepViewModelResult extends ReturnType<typeof useRecapStepViewModel> {}

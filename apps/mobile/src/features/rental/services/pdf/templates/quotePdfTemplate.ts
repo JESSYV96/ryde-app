@@ -2,6 +2,7 @@ import { File } from 'expo-file-system';
 
 import i18n from '@/shared/i18n/i18n';
 import { formatDisplayDate, formatDisplayDateTime } from '@/shared/utils/date';
+import { formatPrice } from '@/shared/utils/pricing';
 import type { RentalCustomer, RentalVehicle } from '@/features/rental/model/rental.types';
 
 export interface QuotePdfData {
@@ -14,6 +15,9 @@ export interface QuotePdfData {
   conditionNotes: string;
   photos: { uri: string }[];
   generatedAt: string;
+  totalPrice: number;
+  billableHalfDays: number;
+  currency: string;
 }
 
 export const buildQuotePdfHtml = async (data: QuotePdfData): Promise<string> => {
@@ -58,6 +62,13 @@ export const buildQuotePdfHtml = async (data: QuotePdfData): Promise<string> => 
           <div class="row"><span>${t('rental:pdf.plateLabel')}</span><span>${data.vehicle.licensePlate}</span></div>
           <div class="row"><span>${t('rental:pdf.startLabel')}</span><span>${formatDisplayDateTime(data.startDate)}</span></div>
           <div class="row"><span>${t('rental:pdf.endLabel')}</span><span>${formatDisplayDateTime(data.endDate)}</span></div>
+        </div>
+
+        <div class="section">
+          <h2>${t('rental:pdf.pricingSectionTitle')}</h2>
+          <div class="row"><span>${t('rental:pdf.billableHalfDaysLabel')}</span><span>${data.billableHalfDays}</span></div>
+          <div class="row"><span>${t('rental:pdf.includedKmLabel')}</span><span>${(data.vehicle.includedKmPerDay / 2) * data.billableHalfDays} km</span></div>
+          <div class="row"><span>${t('rental:pdf.totalPriceLabel')}</span><span>${formatPrice(data.totalPrice, data.currency)}</span></div>
         </div>
 
         <div class="section">

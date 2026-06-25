@@ -7,10 +7,14 @@
     "available": "Disponible",
     "rented": "En location"
   },
+  "card": {
+    "dailyRate": "{{price}} / jour"
+  },
   "detail": {
     "title": "Véhicule",
     "yearLabel": "Année",
     "licensePlateLabel": "Plaque",
-    "colorLabel": "Couleur"
+    "colorLabel": "Couleur",
+    "dailyRateLabel": "Tarif journalier"
   }
 }

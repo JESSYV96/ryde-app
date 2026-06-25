@@ -81,7 +81,8 @@
     "photosSectionTitle": "Photos « avant » ({{count}})",
     "submitting": "Génération…",
     "confirmAndGeneratePdf": "Générer le devis (PDF)",
-    "durationLabel": "Durée : {{duration}}"
+    "durationLabel": "Durée : {{duration}}",
+    "totalPriceLabel": "Prix total : {{price}}"
   },
   "pdf": {
     "documentTitle": "Devis de location",
@@ -95,6 +96,10 @@
     "plateLabel": "Plaque",
     "startLabel": "Début",
     "endLabel": "Fin",
+    "pricingSectionTitle": "Tarification",
+    "billableHalfDaysLabel": "Demi-journées facturées",
+    "includedKmLabel": "Km inclus",
+    "totalPriceLabel": "Prix total",
     "inspectionSectionTitle": "Inspection de départ",
     "mileageLabel": "Kilométrage",
     "fuelLevelLabel": "Niveau de carburant",
@@ -125,7 +130,14 @@
     "startCheckout": "Démarrer le retour du véhicule",
     "returnedOn": "Retourné le {{date}}",
     "proceedToAcceptance": "Procéder à l'acceptation du client",
-    "signatureSectionTitle": "Signature du client"
+    "signatureSectionTitle": "Signature du client",
+    "totalPriceLabel": "Prix total : {{price}}",
+    "quoteChargeLabel": "Devis : {{price}}",
+    "extraMileageChargeLabel": "Surplus de km : {{price}}",
+    "paymentStatusPaid": "Payé",
+    "paymentStatusPending": "En attente",
+    "paidOnLabel": "Payé le {{date}}",
+    "resendPaymentLink": "Renvoyer le lien de paiement"
   },
   "acceptQuoteScreen": {
     "title": "Acceptation du devis",

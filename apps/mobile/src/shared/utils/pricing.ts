@@ -24,3 +24,6 @@ export const computeQuotePrice = (
 
 export const computeExtraKmCharge = (actualKm: number, includedKm: number, extraKmRate: number): number =>
   roundToCents(Math.max(0, actualKm - includedKm) * extraKmRate);
+
+export const formatPrice = (amount: number, currency: string): string =>
+  new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format(amount);

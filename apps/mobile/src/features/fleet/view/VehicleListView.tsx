@@ -12,7 +12,7 @@ import { Spacing } from '@/shared/ui/theme';
 
 export const VehicleListView = () => {
   const { t } = useTranslation('fleet');
-  const { vehicles, isLoading, onSelectVehicle } = useVehicleListViewModel();
+  const { vehicles, isLoading, currency, onSelectVehicle } = useVehicleListViewModel();
 
   return (
     <Screen>
@@ -28,6 +28,7 @@ export const VehicleListView = () => {
                   key={vehicle.id}
                   vehicle={vehicle}
                   isRented={isRented}
+                  currency={currency}
                   onPress={() => onSelectVehicle(vehicle.id)}
                 />
               ))}

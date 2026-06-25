@@ -176,7 +176,7 @@ describe('useRecapStepViewModel', () => {
     expect(rentalRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ vehicleId: vehicle.id, mileageAtStart: 10000 })
     );
-    expect(generateQuotePdf).toHaveBeenCalledWith(rental);
+    expect(generateQuotePdf).toHaveBeenCalledWith(rental, 'CAD');
     expect(rentalRepository.update).toHaveBeenCalledWith(rental.id, { quotePdfUri: 'file:///quote.pdf' });
     expect(useRentalDraftStore.getState().draft.vehicleId).toBeNull();
     expect(router.dismissTo).toHaveBeenCalledWith('/');

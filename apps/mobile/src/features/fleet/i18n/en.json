@@ -7,10 +7,14 @@
     "available": "Available",
     "rented": "Rented"
   },
+  "card": {
+    "dailyRate": "{{price}} / day"
+  },
   "detail": {
     "title": "Vehicle",
     "yearLabel": "Year",
     "licensePlateLabel": "License plate",
-    "colorLabel": "Color"
+    "colorLabel": "Color",
+    "dailyRateLabel": "Daily rate"
   }
 }

@@ -10,9 +10,10 @@ import { LoadingIndicator } from '@/shared/ui/components/LoadingIndicator';
 import { Screen } from '@/shared/ui/components/Screen';
 import { Colors, Elevation, FontSize, Fonts, Radius, Spacing } from '@/shared/ui/theme';
 import { formatDisplayDateTime } from '@/shared/utils/date';
+import { formatPrice } from '@/shared/utils/pricing';
 
 export const RecapStepView = () => {
-  const { draft, vehicle, form, onBack, onCancel } = useRecapStepViewModel();
+  const { draft, vehicle, quotePrice, currency, form, onBack, onCancel } = useRecapStepViewModel();
   const { t } = useTranslation('rental');
   const durationLabel = useRentalDurationLabel(draft.startDate || null, draft.endDate || null);
 
@@ -56,6 +57,9 @@ export const RecapStepView = () => {
           })}
         </Text>
         {durationLabel ? <Text>{t('recapStep.durationLabel', { duration: durationLabel })}</Text> : null}
+        {quotePrice ? (
+          <Text>{t('recapStep.totalPriceLabel', { price: formatPrice(quotePrice.totalPrice, currency) })}</Text>
+        ) : null}
       </View>
 
       <View style={styles.section}>

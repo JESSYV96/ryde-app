@@ -8,6 +8,8 @@ import { getRentalStatus, RentalStatus } from '@/features/rental/model/rental.ty
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
+import { companySettingsQueryKeys } from '@/features/settings/repository/CompanySettingsRepository.interface';
+import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
 
 interface UseVehicleListViewModelDeps {
   fleetRepository?: FleetRepositoryInterface;
@@ -28,6 +30,11 @@ export const useVehicleListViewModel = ({
     queryFn: () => rentalRepo.getAll(),
   });
 
+  const { data: companySettings } = useQuery({
+    queryKey: companySettingsQueryKeys.detail(),
+    queryFn: () => companySettingsRepository.getSettings(),
+  });
+
   const vehiclesWithStatus = (vehicles ?? []).map((vehicle) => ({
     vehicle,
     isRented: (rentals ?? []).some(
@@ -39,7 +46,12 @@ export const useVehicleListViewModel = ({
     router.push({ pathname: '/vehicles/[id]', params: { id } });
   };
 
-  return { vehicles: vehiclesWithStatus, isLoading: isLoadingVehicles || isLoadingRentals, onSelectVehicle };
+  return {
+    vehicles: vehiclesWithStatus,
+    isLoading: isLoadingVehicles || isLoadingRentals,
+    currency: companySettings?.currency ?? 'CAD',
+    onSelectVehicle,
+  };
 };
 
 export interface UseVehicleListViewModelResult extends ReturnType<typeof useVehicleListViewModel> {}

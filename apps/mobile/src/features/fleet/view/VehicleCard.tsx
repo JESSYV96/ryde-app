@@ -4,14 +4,16 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Vehicle } from '@/features/fleet/model/vehicle.types';
 import { StatusBadge } from '@/shared/ui/design-system/atoms/StatusBadge';
 import { Colors, Elevation, FontSize, Fonts, Radius, Spacing } from '@/shared/ui/theme';
+import { formatPrice } from '@/shared/utils/pricing';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
   isRented: boolean;
+  currency: string;
   onPress: () => void;
 }
 
-export const VehicleCard = ({ vehicle, isRented, onPress }: VehicleCardProps) => {
+export const VehicleCard = ({ vehicle, isRented, currency, onPress }: VehicleCardProps) => {
   const { t } = useTranslation('fleet');
   const initials = `${vehicle.make.charAt(0)}${vehicle.model.charAt(0)}`.toUpperCase();
 
@@ -23,6 +25,7 @@ export const VehicleCard = ({ vehicle, isRented, onPress }: VehicleCardProps) =>
       <View style={styles.content}>
         <Text style={styles.name}>{`${vehicle.make} ${vehicle.model}`}</Text>
         <Text style={styles.subtitle}>{`${vehicle.year} • ${vehicle.licensePlate} • ${vehicle.color}`}</Text>
+        <Text style={styles.subtitle}>{t('card.dailyRate', { price: formatPrice(vehicle.dailyRate, currency) })}</Text>
       </View>
       <StatusBadge
         label={isRented ? t('status.rented') : t('status.available')}

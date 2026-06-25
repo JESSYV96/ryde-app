@@ -81,7 +81,8 @@
     "photosSectionTitle": "\"Before\" photos ({{count}})",
     "submitting": "Generating…",
     "confirmAndGeneratePdf": "Generate quote (PDF)",
-    "durationLabel": "Duration: {{duration}}"
+    "durationLabel": "Duration: {{duration}}",
+    "totalPriceLabel": "Total price: {{price}}"
   },
   "pdf": {
     "documentTitle": "Rental quote",
@@ -95,6 +96,10 @@
     "plateLabel": "Plate",
     "startLabel": "Start",
     "endLabel": "End",
+    "pricingSectionTitle": "Pricing",
+    "billableHalfDaysLabel": "Billable half-days",
+    "includedKmLabel": "Included km",
+    "totalPriceLabel": "Total price",
     "inspectionSectionTitle": "Starting inspection",
     "mileageLabel": "Mileage",
     "fuelLevelLabel": "Fuel level",
@@ -125,7 +130,14 @@
     "startCheckout": "Start vehicle return",
     "returnedOn": "Returned on {{date}}",
     "proceedToAcceptance": "Proceed to client acceptance",
-    "signatureSectionTitle": "Client signature"
+    "signatureSectionTitle": "Client signature",
+    "totalPriceLabel": "Total price: {{price}}",
+    "quoteChargeLabel": "Quote: {{price}}",
+    "extraMileageChargeLabel": "Extra mileage: {{price}}",
+    "paymentStatusPaid": "Paid",
+    "paymentStatusPending": "Pending",
+    "paidOnLabel": "Paid on {{date}}",
+    "resendPaymentLink": "Resend payment link"
   },
   "acceptQuoteScreen": {
     "title": "Quote acceptance",

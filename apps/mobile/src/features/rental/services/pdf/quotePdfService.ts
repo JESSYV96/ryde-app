@@ -5,7 +5,7 @@ import { buildQuotePdfHtml } from '@/features/rental/services/pdf/templates/quot
 import { buildReturnReportPdfHtml } from '@/features/rental/services/pdf/templates/returnReportPdfTemplate';
 import { nowIso } from '@/shared/utils/date';
 
-export const generateQuotePdf = async (rental: Rental): Promise<string> => {
+export const generateQuotePdf = async (rental: Rental, currency: string): Promise<string> => {
   const html = await buildQuotePdfHtml({
     customer: rental.customer,
     vehicle: rental.vehicleSnapshot,
@@ -16,6 +16,9 @@ export const generateQuotePdf = async (rental: Rental): Promise<string> => {
     conditionNotes: rental.conditionNotes,
     photos: rental.photos.map((photo) => ({ uri: photo.uri })),
     generatedAt: nowIso(),
+    totalPrice: rental.totalPrice,
+    billableHalfDays: rental.billableHalfDays,
+    currency,
   });
 
   const { uri } = await printToFileAsync({ html });

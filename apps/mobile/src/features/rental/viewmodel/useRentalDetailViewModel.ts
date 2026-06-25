@@ -8,6 +8,7 @@ import { getRentalStatus, PaymentStatus, type Payment } from '@/features/rental/
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
+import { companySettingsQueryKeys } from '@/features/settings/repository/CompanySettingsRepository.interface';
 import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
 
 interface UseRentalDetailViewModelDeps {
@@ -24,6 +25,12 @@ export const useRentalDetailViewModel = (
     queryKey: rentalQueryKeys.detail(rentalId),
     queryFn: () => repository.getById(rentalId),
   });
+
+  const { data: companySettings } = useQuery({
+    queryKey: companySettingsQueryKeys.detail(),
+    queryFn: () => companySettingsRepository.getSettings(),
+  });
+  const currency = companySettings?.currency ?? 'CAD';
 
   const status = rental ? getRentalStatus(rental) : null;
 
@@ -114,6 +121,7 @@ export const useRentalDetailViewModel = (
   return {
     rental,
     status,
+    currency,
     isLoading,
     onShareQuotePdf,
     onShareReturnReportPdf,

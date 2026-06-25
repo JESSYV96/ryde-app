@@ -3,22 +3,34 @@ import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { RentalStatus } from '@/features/rental/model/rental.types';
+import { PaymentStatus, RentalStatus } from '@/features/rental/model/rental.types';
 import { useRentalDetailViewModel } from '@/features/rental/viewmodel/useRentalDetailViewModel';
 import { LoadingIndicator } from '@/shared/ui/components/LoadingIndicator';
 import { Screen } from '@/shared/ui/components/Screen';
 import { Button } from '@/shared/ui/design-system/atoms/Button';
 import { SectionTitle } from '@/shared/ui/design-system/atoms/SectionTitle';
+import { StatusBadge } from '@/shared/ui/design-system/atoms/StatusBadge';
 import { Colors, Elevation, Radius, Spacing } from '@/shared/ui/theme';
 import { formatDisplayDateTime } from '@/shared/utils/date';
+import { formatPrice } from '@/shared/utils/pricing';
 
 interface RentalDetailViewProps {
   rentalId: string;
 }
 
 export const RentalDetailView = ({ rentalId }: RentalDetailViewProps) => {
-  const { rental, status, isLoading, onShareQuotePdf, onShareReturnReportPdf, onStartCheckout, onProceedToAcceptance } =
-    useRentalDetailViewModel(rentalId);
+  const {
+    rental,
+    status,
+    currency,
+    isLoading,
+    onShareQuotePdf,
+    onShareReturnReportPdf,
+    onStartCheckout,
+    onProceedToAcceptance,
+    onResendPaymentLink,
+    isResendingPaymentLink,
+  } = useRentalDetailViewModel(rentalId);
   const { t } = useTranslation('rental');
 
   const header = (
@@ -91,6 +103,7 @@ export const RentalDetailView = ({ rentalId }: RentalDetailViewProps) => {
 
       <View style={styles.section}>
         <SectionTitle>{t('detail.quotePdfSectionTitle')}</SectionTitle>
+        <Text>{t('detail.totalPriceLabel', { price: formatPrice(rental.totalPrice, currency) })}</Text>
         {rental.quotePdfUri ? (
           <Button label={t('detail.shareQuotePdf')} onPress={onShareQuotePdf} />
         ) : (
@@ -102,6 +115,30 @@ export const RentalDetailView = ({ rentalId }: RentalDetailViewProps) => {
             <Image source={{ uri: rental.signatureUri }} style={styles.signatureThumbnail} />
           </>
         ) : null}
+        {rental.payments.map((payment) => (
+          <View key={payment.id} style={styles.paymentRow}>
+            <Text style={styles.licensePhotoLabel}>
+              {t(payment.kind === 'extra-mileage' ? 'detail.extraMileageChargeLabel' : 'detail.quoteChargeLabel', {
+                price: formatPrice(payment.amount, payment.currency),
+              })}
+            </Text>
+            <StatusBadge
+              label={payment.status === PaymentStatus.Paid ? t('detail.paymentStatusPaid') : t('detail.paymentStatusPending')}
+              tone={payment.status === PaymentStatus.Paid ? 'positive' : 'pending'}
+            />
+            {payment.status === PaymentStatus.Paid && payment.paidAt ? (
+              <Text>{t('detail.paidOnLabel', { date: formatDisplayDateTime(payment.paidAt) })}</Text>
+            ) : (
+              <Button
+                label={t('detail.resendPaymentLink')}
+                variant="outlined"
+                size="small"
+                disabled={isResendingPaymentLink}
+                onPress={() => onResendPaymentLink(payment)}
+              />
+            )}
+          </View>
+        ))}
       </View>
 
       {status === RentalStatus.PendingAcceptance ? (
@@ -171,5 +208,11 @@ const styles = StyleSheet.create({
   licensePhotoLabel: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  paymentRow: {
+    gap: Spacing.half,
+    paddingTop: Spacing.one,
+    borderTopWidth: 1,
+    borderTopColor: Colors.light.backgroundElement,
   },
 });
