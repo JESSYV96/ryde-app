@@ -1,0 +1,126 @@
+export const PhotoPhase = {
+  Before: 'before',
+  After: 'after',
+} as const;
+
+export type PhotoPhase = (typeof PhotoPhase)[keyof typeof PhotoPhase];
+
+export type DriverLicenseSide = 'front' | 'back';
+
+export type Photo = {
+  id: string;
+  rentalId: string;
+  uri: string;
+  phase: PhotoPhase;
+  takenAt: string;
+};
+
+/**
+ * The customer's info as it was at booking time, embedded on the `Rental`.
+ * No `id`/`createdAt` — there is no separate customer directory yet
+ * (see CLAUDE.md "Persistence & the future-backend seam"), so this is just
+ * the fields the operator typed in step 1, not a reference to an entity.
+ */
+export type RentalCustomer = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  licensePhotoFrontUri: string;
+  licensePhotoBackUri: string;
+};
+
+/**
+ * The vehicle's descriptive info as it was at booking time, embedded on the
+ * `Rental`. No `id` — `Rental.vehicleId` is already the reference back to
+ * the fleet entry; this is just what that vehicle looked like when booked,
+ * so a later edit/retirement in the fleet doesn't change past quotes.
+ */
+export type RentalVehicle = {
+  make: string;
+  model: string;
+  year: number;
+  licensePlate: string;
+  color: string;
+};
+
+/**
+ * A photo as submitted when creating a `Rental` — before it has an `id` or
+ * a `rentalId` of its own, since the rental it belongs to doesn't exist yet.
+ * Only `before` photos are captured during creation; `after` photos are
+ * submitted later via `RentalReturnPhotoInput` at checkout.
+ */
+export type RentalPhotoInput = {
+  uri: string;
+  phase: typeof PhotoPhase.Before;
+  takenAt: string;
+};
+
+/**
+ * An after-photo submitted at checkout, before it has an `id`/`rentalId`
+ * of its own (mirrors `RentalPhotoInput` for the return side).
+ */
+export type RentalReturnPhotoInput = {
+  uri: string;
+  phase: typeof PhotoPhase.After;
+  takenAt: string;
+};
+
+export type Rental = {
+  id: string;
+  customer: RentalCustomer;
+  vehicleId: string;
+  vehicleSnapshot: RentalVehicle;
+  startDate: string;
+  endDate: string;
+  mileageAtStart: number;
+  fuelLevelAtStart: number;
+  conditionNotes: string;
+  photos: Photo[];
+  quotePdfUri: string | null;
+  createdAt: string;
+  acceptedAt: string | null;
+  signatureUri: string | null;
+  returnedAt: string | null;
+  mileageAtEnd: number | null;
+  fuelLevelAtEnd: number | null;
+  endConditionNotes: string | null;
+  returnReportPdfUri: string | null;
+};
+
+export type RentalCreateInput = {
+  customer: RentalCustomer;
+  vehicleId: string;
+  vehicleSnapshot: RentalVehicle;
+  startDate: string;
+  endDate: string;
+  mileageAtStart: number;
+  fuelLevelAtStart: number;
+  conditionNotes: string;
+  photos: RentalPhotoInput[];
+};
+
+/**
+ * What checkout submits to record a car's return. `returnedAt` is not
+ * included — it's assigned by the repository (`nowIso()`), same as
+ * `Rental.createdAt` is on creation, not passed in by the caller.
+ */
+export type RentalReturnInput = {
+  mileageAtEnd: number;
+  fuelLevelAtEnd: number;
+  endConditionNotes: string;
+  photos: RentalReturnPhotoInput[];
+};
+
+export const RentalStatus = {
+  PendingAcceptance: 'pending-acceptance',
+  InProgress: 'in-progress',
+  Returned: 'returned',
+} as const;
+
+export type RentalStatus = (typeof RentalStatus)[keyof typeof RentalStatus];
+
+export const getRentalStatus = (rental: Rental): RentalStatus => {
+  if (rental.returnedAt !== null) return RentalStatus.Returned;
+  return rental.acceptedAt === null ? RentalStatus.PendingAcceptance : RentalStatus.InProgress;
+};

@@ -1,0 +1,16 @@
+{
+  "tabName": "Véhicules",
+  "list": {
+    "empty": "Aucun véhicule dans la flotte."
+  },
+  "status": {
+    "available": "Disponible",
+    "rented": "En location"
+  },
+  "detail": {
+    "title": "Véhicule",
+    "yearLabel": "Année",
+    "licensePlateLabel": "Plaque",
+    "colorLabel": "Couleur"
+  }
+}

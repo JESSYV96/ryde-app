@@ -1,0 +1,16 @@
+{
+  "tabName": "Vehicles",
+  "list": {
+    "empty": "No vehicles in the fleet."
+  },
+  "status": {
+    "available": "Available",
+    "rented": "Rented"
+  },
+  "detail": {
+    "title": "Vehicle",
+    "yearLabel": "Year",
+    "licensePlateLabel": "License plate",
+    "colorLabel": "Color"
+  }
+}

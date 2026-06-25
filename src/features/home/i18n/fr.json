@@ -1,0 +1,10 @@
+{
+  "tabName": "Accueil",
+  "pendingAcceptanceSectionTitle": "En attente",
+  "inProgressSectionTitle": "En cours",
+  "pastSectionTitle": "Terminées",
+  "emptyPendingAcceptance": "Aucune location en attente d'acceptation.",
+  "emptyInProgress": "Aucune location en cours.",
+  "emptyPast": "Aucune location terminée.",
+  "newRentalButton": "Nouvelle location"
+}

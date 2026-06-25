@@ -1,0 +1,10 @@
+{
+  "tabName": "Overview",
+  "pendingAcceptanceSectionTitle": "Pending acceptance",
+  "inProgressSectionTitle": "In progress",
+  "pastSectionTitle": "Past",
+  "emptyPendingAcceptance": "No rentals pending acceptance.",
+  "emptyInProgress": "No rentals in progress.",
+  "emptyPast": "No past rentals.",
+  "newRentalButton": "New rental"
+}
