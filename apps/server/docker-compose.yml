@@ -1,0 +1,26 @@
+# Local RabbitMQ broker for the payment side-effect bus. The API (src/index.ts)
+# publishes payment.completed events; the worker (src/worker.ts) consumes them.
+# Both run locally via pnpm — only the broker is containerized here.
+#
+#   docker compose -f apps/server/docker-compose.yml up -d
+#   Management UI: http://localhost:15672  (guest / guest)
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: payment-rabbitmq
+    ports:
+      - '5672:5672' # AMQP protocol (the app connects here)
+      - '15672:15672' # Management web UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq # persist queued messages across restarts
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  rabbitmq-data:
