@@ -50,7 +50,7 @@ Use cases (`application/usecases/`) — `CreatePaymentLink`, `GetPaymentStatus`,
 - **Side effects are non-fatal.** A failed email (on link creation) or push (on
   webhook) is logged and swallowed; it never fails the request.
 - **Secrets stay here.** Stripe/Resend keys are loaded only via
-  `infrastructure/config/env.ts`, never sent to or accepted from the mobile app.
+  `shared/config/env.ts`, never sent to or accepted from the mobile app.
 
 ## Relationship to the mobile app (context map)
 
