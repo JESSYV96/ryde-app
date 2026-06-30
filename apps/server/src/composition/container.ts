@@ -1,38 +1,22 @@
-import { CreatePaymentLink } from '../application/usecases/CreatePaymentLink';
-import { GetPaymentStatus } from '../application/usecases/GetPaymentStatus';
-import { NotifyOnPaymentCompleted } from '../application/usecases/NotifyOnPaymentCompleted';
-import { loadEnv, type Env } from '../infrastructure/config/env';
-import { ExpoPushNotifier } from '../infrastructure/expo/ExpoPushNotifier';
-import { createPaymentLinksRouter } from '../infrastructure/http/controllers/paymentLinksController';
-import { createWebhooksRouter } from '../infrastructure/http/controllers/webhooksController';
-import { createStaticPagesRouter } from '../infrastructure/http/staticPages';
-import { createApp } from '../infrastructure/http/server';
-import { ResendEmailSender } from '../infrastructure/resend/ResendEmailSender';
-import { StripePaymentGateway } from '../infrastructure/stripe/StripePaymentGateway';
+import { buildPaymentsApi } from '../features/payments/payments.api';
+import { buildVehicleRecognitionApi } from '../features/vehicle-recognition/vehicle-recognition.api';
+import { loadEnv, type Env } from '../shared/config/env';
+import { createApp } from '../shared/http/app';
+import { createStaticPagesRouter } from '../shared/http/staticPages';
 
-// Composition root — the only place that knows the concrete adapters. Wires
-// adapters into use cases into inbound controllers, then assembles the app.
-export const buildApp = (env: Env = loadEnv()) => {
-  // Outbound adapters (implement the application ports).
-  const payments = new StripePaymentGateway(
-    env.stripeSecretKey,
-    env.stripeWebhookSecret,
-    env.publicBaseUrl
-  );
-  const email = new ResendEmailSender(env.resendApiKey);
-  const push = new ExpoPushNotifier();
+// Composition root for the API process. Builds each feature slice and assembles
+// their inbound routers into the Express app. The slices own their own wiring;
+// this root only knows the slices and the shared HTTP kernel.
+export const buildApp = async (env: Env = loadEnv()) => {
+  const payments = await buildPaymentsApi(env);
+  const vehicleRecognition = buildVehicleRecognitionApi(env);
 
-  // Use cases.
-  const createPaymentLink = new CreatePaymentLink(payments, email);
-  const getPaymentStatus = new GetPaymentStatus(payments);
-  const notifyOnPaymentCompleted = new NotifyOnPaymentCompleted(push);
-
-  // Inbound adapters.
   const app = createApp({
-    webhooks: createWebhooksRouter(payments, notifyOnPaymentCompleted),
-    paymentLinks: createPaymentLinksRouter(createPaymentLink, getPaymentStatus),
+    webhooks: payments.routers.webhooks,
+    paymentLinks: payments.routers.paymentLinks,
+    vehicleRecognition: vehicleRecognition.routers.vehicleRecognition,
     staticPages: createStaticPagesRouter(),
   });
 
-  return { app, env };
+  return { app, env, rabbit: payments.rabbit };
 };
