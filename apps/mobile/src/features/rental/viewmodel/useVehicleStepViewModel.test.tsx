@@ -16,6 +16,7 @@ jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) =>
 
 const vehicle: Vehicle = {
   id: 'vehicle-1',
+  type: 'car',
   make: 'Toyota',
   model: 'Corolla',
   year: 2022,
@@ -24,11 +25,22 @@ const vehicle: Vehicle = {
   dailyRate: 55,
   includedKmPerDay: 200,
   extraKmRate: 0.3,
+  currentMileage: 42000,
+  photos: [],
 };
 
 const createFakeRepository = (vehicles: Vehicle[]): FleetRepositoryInterface => ({
   getAll: async () => vehicles,
   getById: async (id) => vehicles.find((candidate) => candidate.id === id) ?? null,
+  create: async () => {
+    throw new Error('not implemented');
+  },
+  update: async () => {
+    throw new Error('not implemented');
+  },
+  delete: async () => {
+    throw new Error('not implemented');
+  },
 });
 
 const renderWithQueryClient = async (repository: FleetRepositoryInterface) => {

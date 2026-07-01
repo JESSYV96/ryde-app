@@ -1,11 +1,17 @@
 {
   "tabName": "Véhicules",
   "list": {
-    "empty": "Aucun véhicule dans la flotte."
+    "empty": "Aucun véhicule dans la flotte.",
+    "addButton": "Ajouter un véhicule"
   },
   "status": {
     "available": "Disponible",
     "rented": "En location"
+  },
+  "type": {
+    "car": "Voiture",
+    "motorcycle": "Moto",
+    "truck": "Camion"
   },
   "card": {
     "dailyRate": "{{price}} / jour"
@@ -15,6 +21,70 @@
     "yearLabel": "Année",
     "licensePlateLabel": "Plaque",
     "colorLabel": "Couleur",
-    "dailyRateLabel": "Tarif journalier"
+    "dailyRateLabel": "Tarif journalier",
+    "currentMileageLabel": "Kilométrage",
+    "editButton": "Modifier",
+    "deleteButton": "Supprimer"
+  },
+  "photos": {
+    "title": "Photos",
+    "hint": "Ajoutez des photos pour pré-remplir le véhicule et le reconnaître plus tard.",
+    "primaryHint": "Touchez une photo pour la définir comme principale.",
+    "remove": "Supprimer",
+    "takePhoto": "Prendre une photo",
+    "chooseFromGallery": "Galerie",
+    "prefill": "Pré-remplir depuis les photos",
+    "analyzing": "Analyse en cours…",
+    "recognitionError": "Reconnaissance impossible, réessayez.",
+    "recognitionEmpty": "Aucune information détectée sur les photos, remplissez manuellement.",
+    "cameraDeniedTitle": "Accès caméra requis",
+    "cameraDeniedMessage": "Autorisez l'accès à la caméra dans les Réglages pour photographier le véhicule."
+  },
+  "form": {
+    "createTitle": "Nouveau véhicule",
+    "editTitle": "Modifier le véhicule",
+    "typeLabel": "Type",
+    "makeLabel": "Marque",
+    "makePlaceholder": "Toyota",
+    "modelLabel": "Modèle",
+    "modelPlaceholder": "Corolla",
+    "yearLabel": "Année",
+    "yearPlaceholder": "2022",
+    "licensePlateLabel": "Plaque d'immatriculation",
+    "licensePlatePlaceholder": "ABC-123",
+    "colorLabel": "Couleur",
+    "colorPlaceholder": "Argent",
+    "dailyRateLabel": "Tarif journalier",
+    "dailyRatePlaceholder": "55",
+    "includedKmPerDayLabel": "Km inclus / jour",
+    "includedKmPerDayPlaceholder": "200",
+    "extraKmRateLabel": "Tarif km supplémentaire",
+    "extraKmRatePlaceholder": "0,30",
+    "currentMileageLabel": "Kilométrage actuel (km)",
+    "currentMileagePlaceholder": "42000",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler"
+  },
+  "validation": {
+    "makeRequired": "La marque est requise",
+    "modelRequired": "Le modèle est requis",
+    "yearInvalid": "Entrez une année valide",
+    "licensePlateRequired": "La plaque est requise",
+    "colorRequired": "La couleur est requise",
+    "dailyRateInvalid": "Entrez un tarif journalier supérieur à 0",
+    "includedKmInvalid": "Entrez un nombre de km valide",
+    "extraKmRateInvalid": "Entrez un tarif valide",
+    "currentMileageInvalid": "Entrez un kilométrage valide"
+  },
+  "deleteConfirm": {
+    "title": "Supprimer le véhicule",
+    "message": "Ce véhicule sera définitivement retiré de la flotte.",
+    "confirm": "Supprimer",
+    "cancel": "Annuler"
+  },
+  "delete": {
+    "blockedWhileRentedTitle": "Suppression impossible",
+    "blockedWhileRentedMessage": "Ce véhicule est actuellement loué et ne peut pas être supprimé."
   }
 }

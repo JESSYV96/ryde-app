@@ -1,11 +1,17 @@
 {
   "tabName": "Vehicles",
   "list": {
-    "empty": "No vehicles in the fleet."
+    "empty": "No vehicles in the fleet.",
+    "addButton": "Add a vehicle"
   },
   "status": {
     "available": "Available",
     "rented": "Rented"
+  },
+  "type": {
+    "car": "Car",
+    "motorcycle": "Motorcycle",
+    "truck": "Truck"
   },
   "card": {
     "dailyRate": "{{price}} / day"
@@ -15,6 +21,70 @@
     "yearLabel": "Year",
     "licensePlateLabel": "License plate",
     "colorLabel": "Color",
-    "dailyRateLabel": "Daily rate"
+    "dailyRateLabel": "Daily rate",
+    "currentMileageLabel": "Mileage",
+    "editButton": "Edit",
+    "deleteButton": "Delete"
+  },
+  "photos": {
+    "title": "Photos",
+    "hint": "Add photos to pre-fill the vehicle and recognize it later.",
+    "primaryHint": "Tap a photo to set it as the main one.",
+    "remove": "Remove",
+    "takePhoto": "Take a photo",
+    "chooseFromGallery": "Gallery",
+    "prefill": "Pre-fill from photos",
+    "analyzing": "Analyzing…",
+    "recognitionError": "Recognition failed, please try again.",
+    "recognitionEmpty": "No information detected on the photos, fill it in manually.",
+    "cameraDeniedTitle": "Camera access needed",
+    "cameraDeniedMessage": "Allow camera access in Settings to photograph the vehicle."
+  },
+  "form": {
+    "createTitle": "New vehicle",
+    "editTitle": "Edit vehicle",
+    "typeLabel": "Type",
+    "makeLabel": "Make",
+    "makePlaceholder": "Toyota",
+    "modelLabel": "Model",
+    "modelPlaceholder": "Corolla",
+    "yearLabel": "Year",
+    "yearPlaceholder": "2022",
+    "licensePlateLabel": "License plate",
+    "licensePlatePlaceholder": "ABC-123",
+    "colorLabel": "Color",
+    "colorPlaceholder": "Silver",
+    "dailyRateLabel": "Daily rate",
+    "dailyRatePlaceholder": "55",
+    "includedKmPerDayLabel": "Included km / day",
+    "includedKmPerDayPlaceholder": "200",
+    "extraKmRateLabel": "Extra km rate",
+    "extraKmRatePlaceholder": "0.30",
+    "currentMileageLabel": "Current mileage (km)",
+    "currentMileagePlaceholder": "42000",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel"
+  },
+  "validation": {
+    "makeRequired": "Make is required",
+    "modelRequired": "Model is required",
+    "yearInvalid": "Enter a valid year",
+    "licensePlateRequired": "License plate is required",
+    "colorRequired": "Color is required",
+    "dailyRateInvalid": "Enter a daily rate greater than 0",
+    "includedKmInvalid": "Enter a valid number of km",
+    "extraKmRateInvalid": "Enter a valid rate",
+    "currentMileageInvalid": "Enter a valid mileage"
+  },
+  "deleteConfirm": {
+    "title": "Delete vehicle",
+    "message": "This vehicle will be permanently removed from the fleet.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "delete": {
+    "blockedWhileRentedTitle": "Cannot delete",
+    "blockedWhileRentedMessage": "This vehicle is currently rented and cannot be deleted."
   }
 }
