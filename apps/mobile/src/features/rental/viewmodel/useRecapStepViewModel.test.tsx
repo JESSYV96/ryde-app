@@ -21,6 +21,7 @@ jest.mock('@/features/rental/services/photoStorageService', () => ({ deletePhoto
 
 const vehicle: Vehicle = {
   id: 'vehicle-1',
+  type: 'car',
   make: 'Toyota',
   model: 'Corolla',
   year: 2022,
@@ -29,6 +30,8 @@ const vehicle: Vehicle = {
   dailyRate: 55,
   includedKmPerDay: 200,
   extraKmRate: 0.3,
+  currentMileage: 42000,
+  photos: [],
 };
 
 const createRental = (overrides: Partial<Rental>): Rental => ({
@@ -76,6 +79,15 @@ const createRental = (overrides: Partial<Rental>): Rental => ({
 const createFakeFleetRepository = (vehicles: Vehicle[]): FleetRepositoryInterface => ({
   getAll: async () => vehicles,
   getById: async (id) => vehicles.find((candidate) => candidate.id === id) ?? null,
+  create: async () => {
+    throw new Error('not implemented');
+  },
+  update: async () => {
+    throw new Error('not implemented');
+  },
+  delete: async () => {
+    throw new Error('not implemented');
+  },
 });
 
 const createFakeRentalRepository = (rental: Rental): RentalRepositoryInterface => ({
