@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { FleetRepositoryInterface } from '@/features/fleet/repository/FleetRepository';
 import { fleetQueryKeys } from '@/features/fleet/repository/FleetRepository';
-import { fleetRepository } from '@/features/fleet/repository/SeedFleetRepository';
+import { fleetRepository } from '@/features/fleet/repository/SqliteFleetRepository';
 import { createVehicleSelectionSchema, type VehicleSelectionInput } from '@/features/rental/model/rental.schema';
 import { deletePhotos } from '@/features/rental/services/photoStorageService';
 import { useRentalDraftStore } from '@/store/rentalDraftStore';

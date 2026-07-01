@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 
 import type { FleetRepositoryInterface } from '@/features/fleet/repository/FleetRepository';
 import { fleetQueryKeys } from '@/features/fleet/repository/FleetRepository';
-import { fleetRepository } from '@/features/fleet/repository/SeedFleetRepository';
+import { fleetRepository } from '@/features/fleet/repository/SqliteFleetRepository';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';

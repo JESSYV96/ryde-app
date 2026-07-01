@@ -7,15 +7,16 @@ import { useVehicleListViewModel } from '@/features/fleet/viewmodel/useVehicleLi
 import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { LoadingIndicator } from '@/shared/ui/components/LoadingIndicator';
 import { Screen } from '@/shared/ui/components/Screen';
+import { FloatingActionButton } from '@/shared/ui/design-system/atoms/FloatingActionButton';
 import { Logo } from '@/shared/ui/design-system/atoms/Logo';
 import { Spacing } from '@/shared/ui/theme';
 
 export const VehicleListView = () => {
   const { t } = useTranslation('fleet');
-  const { vehicles, isLoading, currency, onSelectVehicle } = useVehicleListViewModel();
+  const { vehicles, isLoading, currency, onSelectVehicle, onCreateVehicle } = useVehicleListViewModel();
 
   return (
-    <Screen>
+    <Screen floating={<FloatingActionButton onPress={onCreateVehicle} />}>
       <Tabs.Screen options={{ headerShown: true, headerTitle: () => <Logo label={t('tabName')} size={24} /> }} />
       {isLoading ? (
         <LoadingIndicator />

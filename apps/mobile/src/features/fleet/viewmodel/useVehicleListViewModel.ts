@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 
 import type { FleetRepositoryInterface } from '@/features/fleet/repository/FleetRepository';
 import { fleetQueryKeys } from '@/features/fleet/repository/FleetRepository';
-import { fleetRepository } from '@/features/fleet/repository/SeedFleetRepository';
+import { fleetRepository } from '@/features/fleet/repository/SqliteFleetRepository';
 import { getRentalStatus, RentalStatus } from '@/features/rental/model/rental.types';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
@@ -46,11 +46,16 @@ export const useVehicleListViewModel = ({
     router.push({ pathname: '/vehicles/[id]', params: { id } });
   };
 
+  const onCreateVehicle = () => {
+    router.push('/vehicles/new');
+  };
+
   return {
     vehicles: vehiclesWithStatus,
     isLoading: isLoadingVehicles || isLoadingRentals,
     currency: companySettings?.currency ?? 'CAD',
     onSelectVehicle,
+    onCreateVehicle,
   };
 };
 
