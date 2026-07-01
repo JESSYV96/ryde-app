@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "car-rental",
-    "slug": "car-rental",
+    "name": "@ryde/mobile",
+    "slug": "car-rental-monorepo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -48,12 +48,25 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to photograph the vehicle before and after a rental."
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to add pictures of a vehicle.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to photograph a vehicle."
+        }
+      ],
       "expo-localization",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2194b763-4031-45b8-818d-4e5d0e78c89c"
+      }
     }
   }
 }
