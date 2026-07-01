@@ -137,7 +137,10 @@
     "paymentStatusPaid": "Paid",
     "paymentStatusPending": "Pending",
     "paidOnLabel": "Paid on {{date}}",
-    "resendPaymentLink": "Resend payment link"
+    "emailNotSentWarning": "Email could not be sent — share the link with the customer another way.",
+    "resendPaymentLink": "Resend payment link",
+    "paymentPaidPushTitle": "Payment received",
+    "paymentPaidPushBody": "{{customerName}} paid {{price}}"
   },
   "acceptQuoteScreen": {
     "title": "Quote acceptance",

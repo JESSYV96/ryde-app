@@ -98,6 +98,9 @@ export type Payment = {
   status: PaymentStatus;
   stripeSessionId: string;
   paymentUrl: string;
+  /** Whether the payment-link email reached the customer. When false, staff
+   * must share the link another way (the detail screen surfaces a warning). */
+  emailSent: boolean;
   createdAt: string;
   paidAt: string | null;
 };
@@ -109,6 +112,7 @@ export type PaymentInput = {
   status: PaymentStatus;
   stripeSessionId: string;
   paymentUrl: string;
+  emailSent: boolean;
 };
 
 export type Rental = {

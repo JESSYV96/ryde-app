@@ -137,7 +137,10 @@
     "paymentStatusPaid": "Payé",
     "paymentStatusPending": "En attente",
     "paidOnLabel": "Payé le {{date}}",
-    "resendPaymentLink": "Renvoyer le lien de paiement"
+    "emailNotSentWarning": "L'email n'a pas pu être envoyé — partagez le lien avec le client autrement.",
+    "resendPaymentLink": "Renvoyer le lien de paiement",
+    "paymentPaidPushTitle": "Paiement reçu",
+    "paymentPaidPushBody": "{{customerName}} a payé {{price}}"
   },
   "acceptQuoteScreen": {
     "title": "Acceptation du devis",

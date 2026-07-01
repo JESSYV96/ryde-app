@@ -60,6 +60,7 @@ type PaymentRow = {
   status: PaymentStatus;
   stripe_session_id: string;
   payment_url: string;
+  email_sent: number;
   created_at: string;
   paid_at: string | null;
 };
@@ -112,6 +113,7 @@ const mapPaymentRow = (row: PaymentRow): Payment => {
     status: row.status,
     stripeSessionId: row.stripe_session_id,
     paymentUrl: row.payment_url,
+    emailSent: row.email_sent === 1,
     createdAt: row.created_at,
     paidAt: row.paid_at,
   };
@@ -269,8 +271,8 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
     const createdAt = nowIso();
     await db.runAsync(
       `INSERT INTO payments (
-        id, rental_id, kind, amount, currency, status, stripe_session_id, payment_url, created_at, paid_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, rental_id, kind, amount, currency, status, stripe_session_id, payment_url, email_sent, created_at, paid_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       id,
       rentalId,
       input.kind,
@@ -279,6 +281,7 @@ export class SqliteRentalRepository implements RentalRepositoryInterface {
       input.status,
       input.stripeSessionId,
       input.paymentUrl,
+      input.emailSent ? 1 : 0,
       createdAt,
       null
     );

@@ -129,13 +129,18 @@ export const RentalDetailView = ({ rentalId }: RentalDetailViewProps) => {
             {payment.status === PaymentStatus.Paid && payment.paidAt ? (
               <Text>{t('detail.paidOnLabel', { date: formatDisplayDateTime(payment.paidAt) })}</Text>
             ) : (
-              <Button
-                label={t('detail.resendPaymentLink')}
-                variant="outlined"
-                size="small"
-                disabled={isResendingPaymentLink}
-                onPress={() => onResendPaymentLink(payment)}
-              />
+              <>
+                {!payment.emailSent ? (
+                  <Text style={styles.paymentWarning}>{t('detail.emailNotSentWarning')}</Text>
+                ) : null}
+                <Button
+                  label={t('detail.resendPaymentLink')}
+                  variant="outlined"
+                  size="small"
+                  disabled={isResendingPaymentLink}
+                  onPress={() => onResendPaymentLink(payment)}
+                />
+              </>
             )}
           </View>
         ))}
@@ -214,5 +219,9 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.one,
     borderTopWidth: 1,
     borderTopColor: Colors.light.backgroundElement,
+  },
+  paymentWarning: {
+    fontSize: 12,
+    color: Colors.light.overdue,
   },
 });

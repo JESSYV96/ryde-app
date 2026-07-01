@@ -2,12 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { RefObject } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { createAndSendPaymentLink } from '@/features/payment/services/paymentLinkService';
 import { PaymentKind, PaymentStatus } from '@/features/rental/model/rental.types';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
+import { buildPaidPushContent } from '@/features/rental/services/payment/paidPushContent';
+import { createAndSendPaymentLink } from '@/features/rental/services/payment/paymentLinkService';
 import { saveSignature } from '@/features/rental/services/photoStorageService';
 import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
 import type { SignaturePadRef } from '@/shared/ui/design-system/atoms/SignaturePad';
@@ -21,6 +23,7 @@ export const useAcceptQuoteViewModel = (
   { repository = rentalRepository }: UseAcceptQuoteViewModelDeps = {}
 ) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation('rental');
   const [hasSignature, setHasSignature] = useState(false);
 
   const { data: rental, isLoading } = useQuery({
@@ -39,7 +42,7 @@ export const useAcceptQuoteViewModel = (
 
       try {
         const { currency } = await companySettingsRepository.getSettings();
-        const { stripeSessionId, paymentUrl } = await createAndSendPaymentLink({
+        const { stripeSessionId, paymentUrl, emailSent } = await createAndSendPaymentLink({
           rentalId,
           kind: PaymentKind.Quote,
           amount: accepted.totalPrice,
@@ -47,6 +50,11 @@ export const useAcceptQuoteViewModel = (
           customerEmail: accepted.customer.email,
           customerName: `${accepted.customer.firstName} ${accepted.customer.lastName}`,
           vehicleLabel: `${accepted.vehicleSnapshot.make} ${accepted.vehicleSnapshot.model}`,
+          ...buildPaidPushContent(t, {
+            customerName: `${accepted.customer.firstName} ${accepted.customer.lastName}`,
+            amount: accepted.totalPrice,
+            currency,
+          }),
         });
         await repository.addPayment(rentalId, {
           kind: PaymentKind.Quote,
@@ -55,6 +63,7 @@ export const useAcceptQuoteViewModel = (
           status: PaymentStatus.Pending,
           stripeSessionId,
           paymentUrl,
+          emailSent,
         });
       } catch (error) {
         console.warn('Failed to send the quote payment link', error);
@@ -83,4 +92,4 @@ export const useAcceptQuoteViewModel = (
   };
 };
 
-export interface UseAcceptQuoteViewModelResult extends ReturnType<typeof useAcceptQuoteViewModel> {}
+export interface UseAcceptQuoteViewModelResult extends ReturnType<typeof useAcceptQuoteViewModel> { }

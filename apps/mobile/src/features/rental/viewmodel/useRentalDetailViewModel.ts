@@ -2,12 +2,14 @@ import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/rea
 import { router } from 'expo-router';
 import { shareAsync } from 'expo-sharing';
 import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { createAndSendPaymentLink, getPaymentLinkStatus } from '@/features/payment/services/paymentLinkService';
 import { getRentalStatus, PaymentStatus, type Payment } from '@/features/rental/model/rental.types';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
+import { buildPaidPushContent } from '@/features/rental/services/payment/paidPushContent';
+import { createAndSendPaymentLink, getPaymentLinkStatus } from '@/features/rental/services/payment/paymentLinkService';
 import { companySettingsQueryKeys } from '@/features/settings/repository/CompanySettingsRepository.interface';
 import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
 
@@ -20,6 +22,7 @@ export const useRentalDetailViewModel = (
   { repository = rentalRepository }: UseRentalDetailViewModelDeps = {}
 ) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation('rental');
 
   const { data: rental, isLoading } = useQuery({
     queryKey: rentalQueryKeys.detail(rentalId),
@@ -91,7 +94,7 @@ export const useRentalDetailViewModel = (
         return;
       }
       const { currency } = await companySettingsRepository.getSettings();
-      const { stripeSessionId, paymentUrl } = await createAndSendPaymentLink({
+      const { stripeSessionId, paymentUrl, emailSent } = await createAndSendPaymentLink({
         rentalId,
         kind: payment.kind,
         amount: payment.amount,
@@ -99,6 +102,11 @@ export const useRentalDetailViewModel = (
         customerEmail: rental.customer.email,
         customerName: `${rental.customer.firstName} ${rental.customer.lastName}`,
         vehicleLabel: `${rental.vehicleSnapshot.make} ${rental.vehicleSnapshot.model}`,
+        ...buildPaidPushContent(t, {
+          customerName: `${rental.customer.firstName} ${rental.customer.lastName}`,
+          amount: payment.amount,
+          currency,
+        }),
       });
       await repository.addPayment(rentalId, {
         kind: payment.kind,
@@ -107,6 +115,7 @@ export const useRentalDetailViewModel = (
         status: PaymentStatus.Pending,
         stripeSessionId,
         paymentUrl,
+        emailSent,
       });
     },
     onSuccess: () => {
@@ -132,4 +141,4 @@ export const useRentalDetailViewModel = (
   };
 };
 
-export interface UseRentalDetailViewModelResult extends ReturnType<typeof useRentalDetailViewModel> {}
+export interface UseRentalDetailViewModelResult extends ReturnType<typeof useRentalDetailViewModel> { }

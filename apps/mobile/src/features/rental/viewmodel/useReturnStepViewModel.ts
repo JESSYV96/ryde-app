@@ -5,12 +5,13 @@ import { router } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { createAndSendPaymentLink } from '@/features/payment/services/paymentLinkService';
 import { createReturnSchema, type ReturnInput } from '@/features/rental/model/rental.schema';
 import { PaymentKind, PaymentStatus, PhotoPhase } from '@/features/rental/model/rental.types';
 import type { RentalRepositoryInterface } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalQueryKeys } from '@/features/rental/repository/RentalRepository.interface';
 import { rentalRepository } from '@/features/rental/repository/SqliteRentalRepository';
+import { buildPaidPushContent } from '@/features/rental/services/payment/paidPushContent';
+import { createAndSendPaymentLink } from '@/features/rental/services/payment/paymentLinkService';
 import { generateReturnReportPdf } from '@/features/rental/services/pdf/quotePdfService';
 import { copyToPermanentStorage, deletePhotos } from '@/features/rental/services/photoStorageService';
 import { companySettingsRepository } from '@/features/settings/repository/SqliteCompanySettingsRepository';
@@ -66,7 +67,7 @@ export const useReturnStepViewModel = (
         const extraCharge = computeExtraKmCharge(actualKm, includedKm, updated.vehicleSnapshot.extraKmRate);
         if (extraCharge > 0) {
           const { currency } = await companySettingsRepository.getSettings();
-          const { stripeSessionId, paymentUrl } = await createAndSendPaymentLink({
+          const { stripeSessionId, paymentUrl, emailSent } = await createAndSendPaymentLink({
             rentalId,
             kind: PaymentKind.ExtraMileage,
             amount: extraCharge,
@@ -74,6 +75,11 @@ export const useReturnStepViewModel = (
             customerEmail: updated.customer.email,
             customerName: `${updated.customer.firstName} ${updated.customer.lastName}`,
             vehicleLabel: `${updated.vehicleSnapshot.make} ${updated.vehicleSnapshot.model}`,
+            ...buildPaidPushContent(t, {
+              customerName: `${updated.customer.firstName} ${updated.customer.lastName}`,
+              amount: extraCharge,
+              currency,
+            }),
           });
           await repository.addPayment(rentalId, {
             kind: PaymentKind.ExtraMileage,
@@ -82,6 +88,7 @@ export const useReturnStepViewModel = (
             status: PaymentStatus.Pending,
             stripeSessionId,
             paymentUrl,
+            emailSent,
           });
         }
       } catch (error) {
@@ -181,4 +188,4 @@ export const useReturnStepViewModel = (
   };
 };
 
-export interface UseReturnStepViewModelResult extends ReturnType<typeof useReturnStepViewModel> {}
+export interface UseReturnStepViewModelResult extends ReturnType<typeof useReturnStepViewModel> { }

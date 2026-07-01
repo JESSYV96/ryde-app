@@ -10,6 +10,9 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { registerForPushNotificationsAsync } from '@/shared/notifications/pushNotifications';
+import { useNotificationObserver } from '@/shared/notifications/useNotificationObserver';
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -34,6 +37,12 @@ const RootLayout = () => {
     NunitoSans_800ExtraBold,
     Orbitron_700Bold,
   });
+
+  useNotificationObserver();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
